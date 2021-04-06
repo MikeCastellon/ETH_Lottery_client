@@ -26,7 +26,6 @@ function App() {
 
   const onSubmit = async (event) => {
     event.preventDefault()
-    window.ethereum.enable()
 
     const accounts = await web3.eth.getAccounts()
 
@@ -39,6 +38,17 @@ function App() {
     setMessage('You have been entered!')
   }
   
+  const onClick = async (event) => {
+    const accounts = await web3.eth.getAccounts()
+    setMessage('Waiting on transaction success')
+    await lottery.methods.pickWinner().send({
+      from: accounts[0]
+    })
+    setMessage('Winner has been picked!!')
+
+    
+  }
+
   return (
     <div className="App">
       <h2>Lottery Contract</h2>
@@ -58,6 +68,9 @@ function App() {
         <button>Enter</button>
       </form>
 
+      <hr/>
+      <h4>Ready to pick a Winner!</h4>
+      <button onClick={onClick}>Pick a Winner!</button>
       <hr/>
 
       <h3>{message}</h3>
