@@ -7,6 +7,7 @@ function App() {
   const [players, setPlayers] = useState([])
   const [prize, setPrize] = useState('')
   const [value, setValue] = useState('')
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     async function getManager(){
@@ -23,8 +24,19 @@ function App() {
     getManager()
   }, [])
 
-  onSubmit = () => {
+  const onSubmit = async (event) => {
+    event.preventDefault()
+    window.ethereum.enable()
 
+    const accounts = await web3.eth.getAccounts()
+
+    setMessage('Waiting on transaction success')
+
+    await lottery.methods.enter().send({
+      from: accounts[0],
+      value: web3.utils.toWei(value, 'ether')
+    })
+    setMessage('You have been entered!')
   }
   
   return (
@@ -34,16 +46,21 @@ function App() {
 
       <hr/>
       <h4>Want to try your luck?</h4>
-      <form onSubmit={this.onSubmit}>
+      <form onSubmit={onSubmit}>
         <label>Amount of Ether you want to enter.</label>
         <div>
           <input
+            placeholder='min to enter 0.01 ether'
             value={value}
             onChange={event => setValue(event.target.value)}
           />
         </div>
         <button>Enter</button>
       </form>
+
+      <hr/>
+
+      <h3>{message}</h3>
     </div>
   );
 }
